@@ -1,22 +1,16 @@
-# Muzik Application Configuration
-# This file contains default configuration values
-
 app:
-  name: "Muzik"
-  version: "0.1.0"
   debug: false
-
-logging:
-  level: "INFO"
-  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-  file: null  # Set to a file path to enable file logging
-
+  name: Muzik
+  version: 0.1.0
 display:
   colors: true
   unicode: true
-  width: 80
-
-# Add your custom configuration sections below
-# custom:
-#   setting1: "value1"
-#   setting2: "value2" 
+logging:
+  format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+  level: INFO
+spotify:
+  access_token: 'access_token'
+  client_id: 'client_id'
+  client_secret: 'client_secret'
+  redirect_uri: 'http://localhost:8888/callback'
+  refresh_token: 'refresh_token'

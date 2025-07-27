@@ -20,6 +20,10 @@ class Config:
         Args:
             config_file: Optional path to configuration file
         """
+        # If no config_file specified, try to load config.yaml by default
+        if config_file is None:
+            config_file = "config.yaml"
+        
         self.config_file = config_file
         self.config_data: Dict[str, Any] = {}
         
@@ -46,6 +50,13 @@ class Config:
                 "colors": True,
                 "unicode": True,
             },
+            "spotify": {
+                "access_token": "",
+                "refresh_token": "",
+                "client_id": "",
+                "client_secret": "",
+                "redirect_uri": "http://localhost:8888/callback",
+            },
         }
         
         # Load from config file if provided
@@ -71,6 +82,10 @@ class Config:
             "MUZIK_DEBUG": ("app", "debug", bool),
             "MUZIK_LOG_LEVEL": ("logging", "level", str),
             "MUZIK_COLORS": ("display", "colors", bool),
+            "SPOTIFY_ACCESS_TOKEN": ("spotify", "access_token", str),
+            "SPOTIFY_REFRESH_TOKEN": ("spotify", "refresh_token", str),
+            "SPOTIFY_CLIENT_ID": ("spotify", "client_id", str),
+            "SPOTIFY_CLIENT_SECRET": ("spotify", "client_secret", str),
         }
         
         for env_var, (section, key, value_type) in env_mappings.items():

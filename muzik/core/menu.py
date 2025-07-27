@@ -258,6 +258,11 @@ class Menu:
 
 def show_main_menu() -> None:
     """Show the main application menu."""
+    from .songs import show_songs_menu
+    from .settings import show_settings_menu
+    from .application import show_application_menu
+    from .about import show_about_menu
+    
     menu = Menu("🎵 Muzik Console Application")
     
     # Songs section
@@ -307,200 +312,6 @@ def show_main_menu() -> None:
     menu.run()
 
 
-def show_songs_menu() -> None:
-    """Show the songs menu."""
-    menu = Menu("🎵 Songs")
-    
-    menu.add_item(
-        "Find songs by title",
-        lambda: console.print("[blue]Searching songs by title...[/blue]"),
-        "Search for songs using title",
-        "1"
-    )
-    
-    menu.add_item(
-        "Find songs by authors",
-        lambda: console.print("[blue]Searching songs by authors...[/blue]"),
-        "Search for songs using author names",
-        "2"
-    )
-    
-    menu.add_item(
-        "Find songs by singers",
-        lambda: console.print("[blue]Searching songs by singers...[/blue]"),
-        "Search for songs using singer names",
-        "3"
-    )
-    
-    menu.add_separator()
-    
-    menu.add_item(
-        "Back to Main Menu",
-        lambda: setattr(menu, 'running', False),
-        "Return to main menu",
-        "b"
-    )
-    
-    menu.run()
-
-
-def show_settings_menu() -> None:
-    """Show the settings menu."""
-    menu = Menu("⚙️ Settings")
-    
-    menu.add_item(
-        "Config",
-        show_config_menu,
-        "Manage application configuration",
-        "1"
-    )
-    
-    menu.add_item(
-        "Utilities",
-        show_utils_menu,
-        "Access utility functions",
-        "2"
-    )
-    
-    menu.add_separator()
-    
-    menu.add_item(
-        "Back to Main Menu",
-        lambda: setattr(menu, 'running', False),
-        "Return to main menu",
-        "b"
-    )
-    
-    menu.run()
-
-
-def show_application_menu() -> None:
-    """Show the application menu."""
-    menu = Menu("📱 Application")
-    
-    menu.add_item(
-        "Application info",
-        lambda: console.print("[blue]Muzik v0.1.0 - A modern Python console application[/blue]"),
-        "Show application information",
-        "1"
-    )
-    
-    menu.add_item(
-        "Application status",
-        lambda: console.print("[green]✓ Application is running and ready[/green]"),
-        "Check application status",
-        "2"
-    )
-    
-    menu.add_separator()
-    
-    menu.add_item(
-        "Back to Main Menu",
-        lambda: setattr(menu, 'running', False),
-        "Return to main menu",
-        "b"
-    )
-    
-    menu.run()
-
-
-def show_about_menu() -> None:
-    """Show the about menu."""
-    menu = Menu("ℹ️ About")
-    
-    menu.add_item(
-        "Author",
-        lambda: console.print("[blue]Created by: Your Name[/blue]\n[blue]Email: your.email@example.com[/blue]"),
-        "Information about the author",
-        "1"
-    )
-    
-    menu.add_separator()
-    
-    menu.add_item(
-        "Back to Main Menu",
-        lambda: setattr(menu, 'running', False),
-        "Return to main menu",
-        "b"
-    )
-    
-    menu.run()
-
-
-def show_config_menu() -> None:
-    """Show the configuration menu."""
-    menu = Menu("⚙️ Configuration")
-    
-    menu.add_item(
-        "Show Current Config",
-        lambda: console.print("[blue]Current configuration loaded[/blue]"),
-        "Display current configuration",
-        "1"
-    )
-    
-    menu.add_item(
-        "Edit Config File",
-        lambda: console.print("[yellow]Opening config.yaml in editor...[/yellow]"),
-        "Edit configuration file",
-        "2"
-    )
-    
-    menu.add_item(
-        "Reset to Defaults",
-        lambda: console.print("[yellow]Configuration reset to defaults[/yellow]"),
-        "Reset configuration to default values",
-        "3"
-    )
-    
-    menu.add_separator()
-    
-    menu.add_item(
-        "Back to Main Menu",
-        lambda: setattr(menu, 'running', False),
-        "Return to main menu",
-        "b"
-    )
-    
-    menu.run()
-
-
-def show_utils_menu() -> None:
-    """Show the utilities menu."""
-    menu = Menu("🔧 Utilities")
-    
-    menu.add_item(
-        "Validate Email",
-        lambda: console.print("[blue]Email validation utility[/blue]"),
-        "Validate email addresses",
-        "1"
-    )
-    
-    menu.add_item(
-        "Validate URL",
-        lambda: console.print("[blue]URL validation utility[/blue]"),
-        "Validate URLs",
-        "2"
-    )
-    
-    menu.add_item(
-        "Display Table",
-        lambda: console.print("[blue]Table display utility[/blue]"),
-        "Display data in tables",
-        "3"
-    )
-    
-    menu.add_separator()
-    
-    menu.add_item(
-        "Back to Main Menu",
-        lambda: setattr(menu, 'running', False),
-        "Return to main menu",
-        "b"
-    )
-    
-    menu.run()
-
-
 def create_simple_menu(
     title: str,
     options: List[Tuple[str, Callable, Optional[str]]],
@@ -528,4 +339,4 @@ def create_simple_menu(
             "b"
         )
     
-    menu.run() 
+    menu.run()

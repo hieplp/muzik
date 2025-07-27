@@ -15,7 +15,7 @@ from muzik import __version__
 from muzik.core.config import Config
 from muzik.core.logger import setup_logger
 from muzik.utils.display import print_banner
-from muzik.utils.menu import show_main_menu
+from muzik.core.menu import show_main_menu
 
 # Create Typer app
 app = typer.Typer(

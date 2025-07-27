@@ -7,6 +7,7 @@ A feature-rich Python console application built with modern tools and best pract
 - 🎵 **Modern CLI Interface** - Built with Typer for beautiful command-line interfaces
 - 🎨 **Rich Output** - Beautiful console output with colors and formatting using Rich
 - ⚙️ **Configuration Management** - Flexible configuration with YAML files and environment variables
+- 🎵 **Spotify Integration** - Search tracks, view playlists, and manage your Spotify library
 - 📝 **Comprehensive Logging** - Rich logging with multiple levels and output formats
 - 🧪 **Testing Suite** - Full test coverage with pytest
 - 🔧 **Development Tools** - Code formatting, linting, and type checking
@@ -67,6 +68,9 @@ The application supports configuration through:
    export MUZIK_DEBUG=true
    export MUZIK_LOG_LEVEL=DEBUG
    export MUZIK_COLORS=false
+   export SPOTIFY_ACCESS_TOKEN=your_access_token
+   export SPOTIFY_CLIENT_ID=your_client_id
+   export SPOTIFY_CLIENT_SECRET=your_client_secret
    ```
 
 2. **Configuration File** (YAML):
@@ -78,12 +82,39 @@ The application supports configuration through:
      level: "DEBUG"
    display:
      colors: true
+   spotify:
+     access_token: "your_access_token"
+     refresh_token: "your_refresh_token"
+     client_id: "your_client_id"
+     client_secret: "your_client_secret"
+     redirect_uri: "http://localhost:8888/callback"
    ```
 
 3. **Command Line Options**:
    ```bash
    muzik --verbose --config my-config.yaml
    ```
+
+### Spotify Integration
+
+To use Spotify features, you need to configure your Spotify API credentials:
+
+1. **Get Spotify API Credentials**:
+   - Go to [Spotify Developer Dashboard](https://developer.spotify.com/dashboard)
+   - Create a new application
+   - Get your Client ID and Client Secret
+   - Set up OAuth redirect URI (default: `http://localhost:8888/callback`)
+
+2. **Configure in the Application**:
+   - Run the application and go to Settings > Spotify API Settings
+   - Enter your Client ID and Client Secret
+   - Generate and enter your Access Token and Refresh Token
+
+3. **Available Spotify Features**:
+   - Search for tracks by title, artist, or album
+   - View your personal playlists
+   - Browse playlist contents
+   - Get track details and metadata
 
 ## Development
 
@@ -225,6 +256,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - **python-dotenv** - Environment variable management
 - **requests** - HTTP library
 - **tabulate** - Pretty-print tabular data
+- **spotipy** - Spotify Web API wrapper
 
 ### Development Dependencies
 
