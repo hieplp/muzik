@@ -1,0 +1,22 @@
+# Muzik Application Configuration
+# This file contains default configuration values
+
+app:
+  name: "Muzik"
+  version: "0.1.0"
+  debug: false
+
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: null  # Set to a file path to enable file logging
+
+display:
+  colors: true
+  unicode: true
+  width: 80
+
+# Add your custom configuration sections below
+# custom:
+#   setting1: "value1"
+#   setting2: "value2" 
