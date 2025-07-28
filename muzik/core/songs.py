@@ -6,8 +6,9 @@ from rich.console import Console
 from rich.prompt import Prompt, Confirm
 
 from .config import Config
-from .spotify_config import validate_spotify_config
-from .spotify_api import SpotifyAPI, display_tracks_table, display_playlists_table
+from .spotify.auth import validate_spotify_config
+from .spotify.client import SpotifyAPI
+from .spotify.display import display_tracks_table, display_playlists_table
 
 console = Console()
 
