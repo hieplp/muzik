@@ -2,13 +2,14 @@
 Simple interactive menu system that works reliably.
 """
 
-import sys
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
 from rich.console import Console
 from rich.panel import Panel
 from rich.text import Text
 from rich.table import Table
+
+from ..utils.input_utils import get_single_char
 
 console = Console()
 
@@ -132,64 +133,7 @@ class Menu:
     
     def _get_single_char(self) -> str:
         """Get a single character input."""
-        try:
-            if sys.platform == "win32":
-                import msvcrt
-                char = msvcrt.getch()
-                # Check for Ctrl+C on Windows
-                if char == b'\x03':
-                    raise KeyboardInterrupt
-                if char == b'\xe0':  # Extended key prefix
-                    char = msvcrt.getch()
-                    if char == b'H':  # Up arrow
-                        return 'up'
-                    elif char == b'P':  # Down arrow
-                        return 'down'
-                    elif char == b'M':  # Right arrow
-                        return 'right'
-                    elif char == b'K':  # Left arrow
-                        return 'left'
-                return char.decode('utf-8', errors='ignore')
-            else:
-                import tty
-                import termios
-                
-                fd = sys.stdin.fileno()
-                old_settings = termios.tcgetattr(fd)
-                try:
-                    tty.setraw(sys.stdin.fileno())
-                    char = sys.stdin.read(1)
-                    
-                    # Check for Ctrl+C (ASCII 3)
-                    if char == '\x03':
-                        raise KeyboardInterrupt                    
-                    # Handle arrow key escape sequences
-                    if char == '\x1b':  # Escape sequence
-                        next_char = sys.stdin.read(1)
-                        if next_char == '[':
-                            third_char = sys.stdin.read(1)
-                            if third_char == 'A':  # Up arrow
-                                return 'up'
-                            elif third_char == 'B':  # Down arrow
-                                return 'down'
-                            elif third_char == 'C':  # Right arrow
-                                return 'right'
-                            elif third_char == 'D':  # Left arrow
-                                return 'left'
-                    return char
-                finally:
-                    termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
-        except KeyboardInterrupt:
-            # Re-raise KeyboardInterrupt 
-            console.print("\n[dim]Press Enter to exit...[/dim]")
-            input()
-            raise
-        except Exception:
-            # Fallback to simple input
-            try:
-                return console.input("").strip()
-            except KeyboardInterrupt:
-                raise
+        return get_single_char()
     
     def _handle_input(self) -> None:
         """Handle keyboard input."""
