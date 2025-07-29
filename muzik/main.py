@@ -108,14 +108,48 @@ def menu() -> None:
 
 def main_wrapper() -> None:
     """Wrapper function to handle exceptions gracefully."""
-    try:
-        app()
-    except KeyboardInterrupt:
-        console.print("\n[yellow]Operation cancelled by user[/yellow]")
-        sys.exit(1)
-    except Exception as e:
-        console.print(f"[bold red]Error:[/bold red] {e}")
-        sys.exit(1)
+    while True:
+        try:
+            app()
+            break  # Normal exit
+        except KeyboardInterrupt:
+            from rich.prompt import Confirm
+            from rich.panel import Panel
+            
+            console.print()  # Add blank line for better spacing
+            console.print(Panel(
+                "[yellow]⚠️  Exit Confirmation[/yellow]\n\n"
+                "You pressed Ctrl+C to exit the application.\n"
+                "Are you sure you want to quit?",
+                title="🚪 Exit",
+                border_style="yellow"
+            ))
+            
+            try:
+                if Confirm.ask("[bold]Do you really want to exit?[/bold]", default=False):
+                    console.print()
+                    console.print(Panel(
+                        "[green]Thank you for using Muzik![/green] 🎵",
+                        title="👋 Goodbye",
+                        border_style="green"
+                    ))
+                    sys.exit(0)
+                else:
+                    console.print()
+                    console.print(Panel(
+                        "[blue]Welcome back![/blue] 🎵",
+                        title="▶️  Continuing",
+                        border_style="blue"
+                    ))
+                    # Continue the loop to restart the application
+                    continue
+            except KeyboardInterrupt:
+                # If they press Ctrl+C again during confirmation, force exit
+                console.print("\n[red]💥 Force exit![/red]")
+                sys.exit(1)
+        except Exception as e:
+            console.print(f"[bold red]Error:[/bold red] {e}")
+            sys.exit(1)
 
 
 if __name__ == "__main__":

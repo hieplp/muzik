@@ -136,6 +136,9 @@ class Menu:
             if sys.platform == "win32":
                 import msvcrt
                 char = msvcrt.getch()
+                # Check for Ctrl+C on Windows
+                if char == b'\x03':
+                    raise KeyboardInterrupt
                 if char == b'\xe0':  # Extended key prefix
                     char = msvcrt.getch()
                     if char == b'H':  # Up arrow
@@ -157,6 +160,9 @@ class Menu:
                     tty.setraw(sys.stdin.fileno())
                     char = sys.stdin.read(1)
                     
+                    # Check for Ctrl+C (ASCII 3)
+                    if char == '\x03':
+                        raise KeyboardInterrupt                    
                     # Handle arrow key escape sequences
                     if char == '\x1b':  # Escape sequence
                         next_char = sys.stdin.read(1)
@@ -173,9 +179,17 @@ class Menu:
                     return char
                 finally:
                     termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+        except KeyboardInterrupt:
+            # Re-raise KeyboardInterrupt 
+            console.print("\n[dim]Press Enter to exit...[/dim]")
+            input()
+            raise
         except Exception:
             # Fallback to simple input
-            return console.input("").strip()
+            try:
+                return console.input("").strip()
+            except KeyboardInterrupt:
+                raise
     
     def _handle_input(self) -> None:
         """Handle keyboard input."""
@@ -202,8 +216,11 @@ class Menu:
                 except ValueError:
                     pass
                     
-        except (EOFError, KeyboardInterrupt):
+        except EOFError:
             self.running = False
+        except KeyboardInterrupt:
+            # Re-raise KeyboardInterrupt to allow proper handling at higher levels
+            raise
     
     def _move_selection(self, direction: int) -> None:
         """Move the selection up or down."""
@@ -236,6 +253,9 @@ class Menu:
         
         try:
             item.action()
+        except KeyboardInterrupt:
+            # Re-raise KeyboardInterrupt to allow global exit
+            raise
         except Exception as e:
             console.print(f"[bold red]Error executing {item.title}: {e}[/bold red]")
     
@@ -250,10 +270,14 @@ class Menu:
         if enabled_indices:
             self.selected_index = enabled_indices[0]
         
-        while self.running:
-            console.clear()
-            console.print(self._render_menu())
-            self._handle_input()
+        try:
+            while self.running:
+                console.clear()
+                console.print(self._render_menu())
+                self._handle_input()
+        except KeyboardInterrupt:
+            # Re-raise to allow proper handling at higher levels
+            raise
 
 
 def show_main_menu() -> None:

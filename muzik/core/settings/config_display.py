@@ -90,12 +90,20 @@ def show_current_config(config: Config) -> None:
         
         # Add a pause so user can see the output
         console.print("\n[dim]Press Enter to continue...[/dim]")
-        input()
+        try:
+            input()
+        except KeyboardInterrupt:
+            # Re-raise to allow proper handling at higher levels
+            raise
         
     except Exception as e:
         console.print(f"[red]Error displaying configuration: {e}[/red]")
         console.print("[dim]Press Enter to continue...[/dim]")
-        input()
+        try:
+            input()
+        except KeyboardInterrupt:
+            # Re-raise to allow proper handling at higher levels
+            raise
 
 
 def show_config_with_clear(config: Config) -> None:

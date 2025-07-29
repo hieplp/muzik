@@ -79,6 +79,13 @@ def show_spotify_status(config: Config) -> None:
     if not status['configured']:
         console.print("[red]✗ Spotify API is not configured[/red]")
         console.print("[yellow]Please configure your Client ID and Client Secret first[/yellow]")
+            # Add a pause so user can see the output
+    console.print("\n[dim]Press Enter to continue...[/dim]")
+    try:
+        input()
+    except KeyboardInterrupt:
+        # Re-raise to allow proper handling at higher levels
+        raise
         return
     
     console.print("[green]✓ Spotify API is configured[/green]")
@@ -94,6 +101,14 @@ def show_spotify_status(config: Config) -> None:
             console.print("[green]✓ API connection test successful![/green]")
         else:
             console.print(f"[red]✗ API connection test failed: {error}[/red]")
+    
+    # Add a pause so user can see the output
+    console.print("\n[dim]Press Enter to continue...[/dim]")
+    try:
+        input()
+    except KeyboardInterrupt:
+        # Re-raise to allow proper handling at higher levels
+        raise
 
 
 def _configure_client_credentials(auth: SpotifyAuth) -> None:
