@@ -280,9 +280,110 @@ class Menu:
             raise
 
 
+def show_songs_menu() -> None:
+    """Show the songs menu."""
+    from .config import Config
+    from .spotify.auth import validate_spotify_config
+    from .songs.search import search_spotify_tracks, search_by_title, search_by_author, search_by_singer
+    from .songs.playlists import show_spotify_playlists, manage_playlists
+    from .songs.library import show_personal_library
+    from .songs.management import show_management_menu
+    
+    config = Config()
+    spotify_configured = validate_spotify_config(config)
+    
+    menu = Menu("🎵 Songs")
+    
+    # Spotify integration section
+    if spotify_configured:
+        menu.add_item(
+            "Search Spotify",
+            lambda: search_spotify_tracks(config),
+            "Search for songs using Spotify API",
+            "1"
+        )
+        
+        menu.add_item(
+            "My Spotify Playlists",
+            lambda: show_spotify_playlists(config),
+            "View and manage your Spotify playlists",
+            "2"
+        )
+        
+        menu.add_item(
+            "Manage Playlists",
+            lambda: manage_playlists(config),
+            "Create, edit, and organize playlists",
+            "3"
+        )
+        
+        menu.add_separator()
+    
+    # Search functionality section
+    start_num = 4 if spotify_configured else 1
+    
+    menu.add_item(
+        "Search by Title",
+        lambda: search_by_title(config),
+        "Search for songs using title",
+        str(start_num)
+    )
+    
+    menu.add_item(
+        "Search by Author",
+        lambda: search_by_author(config),
+        "Search for songs using author/composer names",
+        str(start_num + 1)
+    )
+    
+    menu.add_item(
+        "Search by Singer/Artist",
+        lambda: search_by_singer(config),
+        "Search for songs using artist/performer names",
+        str(start_num + 2)
+    )
+    
+    menu.add_separator()
+    
+    # Library and management section
+    menu.add_item(
+        "Personal Library",
+        lambda: show_personal_library(config),
+        "View and manage your personal song collection",
+        str(start_num + 3)
+    )
+    
+    menu.add_item(
+        "Song Management",
+        lambda: show_management_menu(config),
+        "Create playlists, export data, and more",
+        str(start_num + 4)
+    )
+    
+    # Configuration section
+    if not spotify_configured:
+        menu.add_separator()
+        menu.add_item(
+            "Configure Spotify API",
+            lambda: console.print("[yellow]Go to Settings > Configure Spotify to set up API access[/yellow]"),
+            "Set up Spotify API access for enhanced features",
+            str(start_num + 5)
+        )
+    
+    menu.add_separator()
+    
+    menu.add_item(
+        "Back to Main Menu",
+        lambda: setattr(menu, 'running', False),
+        "Return to main menu",
+        "b"
+    )
+    
+    menu.run()
+
+
 def show_main_menu() -> None:
     """Show the main application menu."""
-    from .songs import show_songs_menu
     from .settings import show_settings_menu
     from .application import show_application_menu
     from .about import show_about_menu

@@ -4,8 +4,7 @@ Core functionality for the Muzik application.
 
 from .config import Config
 from .logger import setup_logger
-from .menu import Menu, MenuItem, show_main_menu, create_simple_menu
-from .songs import show_songs_menu
+from .menu import Menu, MenuItem, show_main_menu, create_simple_menu, show_songs_menu
 from .settings import show_settings_menu
 from .application import show_application_menu
 from .about import show_about_menu
