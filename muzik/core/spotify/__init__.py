@@ -21,7 +21,8 @@ from .display import (
     display_track_details,
     display_playlist_details,
     display_album_details,
-    display_artist_details
+    display_artist_details,
+    SpotifyStreamer
 )
 
 __all__ = [
@@ -40,5 +41,6 @@ __all__ = [
     'display_track_details',
     'display_playlist_details',
     'display_album_details',
-    'display_artist_details'
+    'display_artist_details',
+    'SpotifyStreamer'
 ] 
