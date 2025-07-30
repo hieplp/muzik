@@ -74,9 +74,9 @@ def display_track_details(track: Dict[str, Any]) -> None:
         """Display streaming options as a navigable menu."""
         options = [
             ("🎵 Play Preview (30s)", "preview"),
-            ("🎧 Stream Full Track", "stream"),
+            ("🎧 Play Full Track (Console)", "stream"),
             ("🎤 Show Lyrics", "lyrics"),
-            ("🔗 Open in Spotify", "open"),
+            ("🔗 Open in Spotify App/Web", "open"),
             ("⬅️  Back to previous menu", "back")
         ]
         
@@ -140,7 +140,7 @@ def display_track_details(track: Dict[str, Any]) -> None:
                         console.print("\n[yellow]Playing preview...[/yellow]")
                         streamer.play_preview(track)
                     elif option_action == "stream":
-                        console.print("\n[yellow]Streaming full track...[/yellow]")
+                        console.print("\n[yellow]Loading full track for console playback...[/yellow]")
                         streamer.stream_full_track(track)
                     elif option_action == "lyrics":
                         console.print("\n[yellow]Fetching lyrics...[/yellow]")

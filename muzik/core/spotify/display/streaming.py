@@ -21,6 +21,14 @@ try:
 except ImportError:
     PYGAME_AVAILABLE = False
 
+try:
+    import yt_dlp
+    YTDLP_AVAILABLE = True
+except ImportError:
+    YTDLP_AVAILABLE = False
+
+from ...youtube import YoutubePlayer
+
 console = Console()
 
 
@@ -145,75 +153,53 @@ class SpotifyStreamer:
     
     def stream_full_track(self, track: Dict[str, Any]) -> None:
         """
-        Stream the full track by opening Spotify.
+        Stream the full track directly in console using YouTube as source.
+        
+        Args:
+            track: Track dictionary
+        """
+        track_name = track.get('name', 'Unknown')
+        artists = ", ".join(track.get('artists', []))
+        
+        if not YTDLP_AVAILABLE:
+            console.print("[red]❌ YouTube streaming not available. Install yt-dlp: pip install yt-dlp[/red]")
+            console.print("[dim]Falling back to Spotify web opening...[/dim]")
+            self._open_spotify_fallback(track)
+            return
+        
+        if not PYGAME_AVAILABLE:
+            console.print("[red]❌ Audio playback not available. Install pygame: pip install pygame[/red]")
+            console.print("[dim]Falling back to Spotify web opening...[/dim]")
+            self._open_spotify_fallback(track)
+            return
+        
+        # Get lyrics for playback
+        lyrics = self._fetch_lyrics(track_name, artists.split(',')[0].strip())
+        
+        # Use the new YouTube player for better file handling
+        youtube_player = YoutubePlayer()
+        success = youtube_player.play_track(track_name, artists, lyrics)
+        
+        if not success:
+            console.print("[dim]Falling back to Spotify web opening...[/dim]")
+            self._open_spotify_fallback(track)
+    
+
+    
+    def _open_spotify_fallback(self, track: Dict[str, Any]) -> None:
+        """
+        Fallback method to open Spotify when streaming is not available.
         
         Args:
             track: Track dictionary
         """
         spotify_url = track.get('external_url')
-        track_name = track.get('name', 'Unknown')
-        artists = ", ".join(track.get('artists', []))
-        
-        if not spotify_url:
-            console.print("[red]❌ No Spotify URL available[/red]")
-            input("\nPress Enter to continue...")
-            return
-        
-        console.print(f"[green]🎵 Opening '{track_name}' by {artists} in Spotify...[/green]")
-        console.print("[dim]This will open the track in your Spotify app or web browser[/dim]")
-        
-        # Extract track ID from URL
-        track_id = spotify_url.split('/')[-1].split('?')[0]  # Remove query params if any
-        
-        success = False
-        
-        try:
-            # Method 1: Try opening web URL directly (most reliable)
-            webbrowser.open(spotify_url)
-            console.print("[green]✅ Opened in web browser[/green]")
-            success = True
-        except Exception as web_error:
-            console.print(f"[yellow]⚠️ Web browser failed: {web_error}[/yellow]")
-        
-        # Method 2: Try Spotify URI if web failed
-        if not success:
+        if spotify_url:
             try:
-                import subprocess
-                import platform
-                
-                spotify_uri = f"spotify:track:{track_id}"
-                
-                if platform.system() == "Darwin":  # macOS
-                    subprocess.run(["open", spotify_uri], check=True, capture_output=True)
-                    console.print("[green]✅ Opened in Spotify app (macOS)[/green]")
-                    success = True
-                elif platform.system() == "Windows":  # Windows
-                    subprocess.run(["start", spotify_uri], shell=True, check=True, capture_output=True)
-                    console.print("[green]✅ Opened in Spotify app (Windows)[/green]")
-                    success = True
-                elif platform.system() == "Linux":  # Linux
-                    subprocess.run(["xdg-open", spotify_uri], check=True, capture_output=True)
-                    console.print("[green]✅ Opened in Spotify app (Linux)[/green]")
-                    success = True
-                    
-            except (subprocess.CalledProcessError, FileNotFoundError) as app_error:
-                console.print(f"[yellow]⚠️ Spotify app open failed: {app_error}[/yellow]")
-        
-        # Method 3: Final fallback - try webbrowser with URI
-        if not success:
-            try:
-                webbrowser.open(f"spotify:track:{track_id}")
-                console.print("[green]✅ Opened with system handler[/green]")
-                success = True
-            except Exception as uri_error:
-                console.print(f"[yellow]⚠️ URI handler failed: {uri_error}[/yellow]")
-        
-        # If all methods failed, provide manual options
-        if not success:
-            console.print("[red]❌ Could not automatically open Spotify[/red]")
-            console.print(f"[blue]🔗 Manual URL: {spotify_url}[/blue]")
-            console.print(f"[blue]🎵 Spotify URI: spotify:track:{track_id}[/blue]")
-            console.print("[dim]Copy and paste either URL into Spotify or your browser[/dim]")
+                webbrowser.open(spotify_url)
+                console.print("[green]✅ Opened in Spotify web player[/green]")
+            except Exception:
+                console.print(f"[blue]Manual URL: {spotify_url}[/blue]")
         
         input("\nPress Enter to continue...")
     
