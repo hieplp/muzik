@@ -227,7 +227,7 @@ class Menu:
 def show_songs_menu() -> None:
     """Show the songs menu."""
     from .config import Config
-    from .spotify.auth import validate_spotify_config
+    from .spotify.api.auth import validate_spotify_config
     from .songs.search import search_spotify_tracks, search_by_title, search_by_author, search_by_singer
     from .songs.playlists import show_spotify_playlists, manage_playlists
     from .songs.library import show_personal_library
