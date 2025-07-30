@@ -14,11 +14,11 @@ from .spotify import (
     SpotifyAuth, SpotifyTracks, SpotifyAlbums, SpotifyArtists,
     SpotifyPlaylists, SpotifyClient
 )
-from ..utils.spotify_display import display_tracks_table, display_playlists_table
+from .spotify.display import display_tracks_table, display_playlists_table
 
 # Import legacy compatibility
-from .spotify.client import SpotifyAPI
-from .spotify.auth import validate_spotify_config
+from .spotify.api.client import SpotifyAPI
+from .spotify.api.auth import validate_spotify_config
 
 # Import console functions from settings (temporary location)
 from .settings.menu import configure_spotify_tokens, show_spotify_status

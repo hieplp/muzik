@@ -4,7 +4,7 @@ Spotify artists API operations.
 
 from typing import Any, Dict, List, Optional
 
-from ..config import Config
+from ...config import Config
 from .base import BaseSpotifyAPI, SpotifyDataTransformer
 
 

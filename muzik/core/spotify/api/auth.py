@@ -4,7 +4,7 @@ Spotify authentication and token management.
 
 from typing import Optional
 
-from ..config import Config
+from ...config import Config
 
 
 class SpotifyAuth:

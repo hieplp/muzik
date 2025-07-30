@@ -2,15 +2,30 @@
 Spotify API integration modules.
 """
 
-from .auth import SpotifyAuth
-from .tracks import SpotifyTracks
-from .albums import SpotifyAlbums
-from .artists import SpotifyArtists
-from .playlists import SpotifyPlaylists
-from .client import SpotifyClient
-from .base import BaseSpotifyAPI, SpotifyDataTransformer
+# Import from API subdirectory
+from .api import (
+    SpotifyAuth,
+    SpotifyTracks,
+    SpotifyAlbums,
+    SpotifyArtists,
+    SpotifyPlaylists,
+    SpotifyClient,
+    BaseSpotifyAPI,
+    SpotifyDataTransformer
+)
+
+# Import from display subdirectory
+from .display import (
+    display_tracks_table,
+    display_playlists_table,
+    display_track_details,
+    display_playlist_details,
+    display_album_details,
+    display_artist_details
+)
 
 __all__ = [
+    # API classes
     'SpotifyAuth',
     'SpotifyTracks', 
     'SpotifyAlbums',
@@ -18,5 +33,12 @@ __all__ = [
     'SpotifyPlaylists',
     'SpotifyClient',
     'BaseSpotifyAPI',
-    'SpotifyDataTransformer'
+    'SpotifyDataTransformer',
+    # Display functions
+    'display_tracks_table',
+    'display_playlists_table',
+    'display_track_details',
+    'display_playlist_details',
+    'display_album_details',
+    'display_artist_details'
 ] 

@@ -16,8 +16,8 @@ from rich.table import Table
 from rich.progress import Progress, TaskID
 
 from ..config import Config
-from ..spotify.auth import validate_spotify_config
-from ..spotify.client import SpotifyAPI
+from ..spotify.api.auth import validate_spotify_config
+from ..spotify.api.client import SpotifyAPI
 from .library import PersonalLibrary
 
 console = Console()
@@ -337,7 +337,7 @@ def add_tracks_to_spotify_playlist(playlist: Dict[str, Any], config: Config) -> 
                 if query:
                     tracks = spotify.search_tracks(query, limit=10)
                     if tracks:
-                        from ...utils.spotify_display import display_tracks_table
+                        from ..spotify.display import display_tracks_table
                         display_tracks_table(tracks, f"Search results for '{query}'")
                         
                         try:
@@ -356,7 +356,7 @@ def add_tracks_to_spotify_playlist(playlist: Dict[str, Any], config: Config) -> 
                 library = library_manager.load_library()
                 
                 if library["tracks"]:
-                    from ...utils.spotify_display import display_tracks_table
+                    from ..spotify.display import display_tracks_table
                     display_tracks_table(library["tracks"][:20], "Your Library (first 20)")
                     
                     try:

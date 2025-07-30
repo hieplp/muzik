@@ -2,7 +2,7 @@
 Main Spotify client that combines all modules.
 """
 
-from ..config import Config
+from ...config import Config
 from .auth import SpotifyAuth
 from .tracks import SpotifyTracks
 from .albums import SpotifyAlbums

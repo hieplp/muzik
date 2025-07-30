@@ -7,7 +7,7 @@ from rich.prompt import Confirm, Prompt
 from rich.panel import Panel
 
 from ..config import Config
-from ..spotify.auth import SpotifyAuth, validate_spotify_config
+from ..spotify.api.auth import SpotifyAuth, validate_spotify_config
 from .config_display import show_config_with_clear
 from .config_editor import edit_config_file, reset_to_defaults
 from .utilities import validate_email_utility, validate_url_utility, display_table_utility

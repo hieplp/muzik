@@ -9,7 +9,7 @@ from rich.table import Table
 from rich.panel import Panel
 from rich.text import Text
 
-from .input_utils import get_single_char
+from ....utils.input_utils import get_single_char
 
 console = Console()
 

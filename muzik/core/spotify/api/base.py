@@ -5,7 +5,7 @@ Base classes and common patterns for Spotify API operations.
 from typing import Any, Dict, List, Optional, Union
 from contextlib import contextmanager
 
-from ..config import Config
+from ...config import Config
 from .auth import SpotifyAuth
 
 
