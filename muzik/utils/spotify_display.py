@@ -1,5 +1,5 @@
 """
-Display utilities for Spotify data.
+Spotify-specific display utilities for interactive tables and data presentation.
 """
 
 from typing import Any, Dict, List
@@ -9,7 +9,7 @@ from rich.table import Table
 from rich.panel import Panel
 from rich.text import Text
 
-from ...utils.input_utils import get_single_char
+from .input_utils import get_single_char
 
 console = Console()
 
@@ -208,7 +208,7 @@ def display_playlists_table(playlists: List[Dict[str, Any]], title: str = "Playl
         # Add instructions
         instructions = Text()
         instructions.append("↑/↓/WASD: Navigate  ", style="dim")
-        instructions.append("Enter: View Tracks  ", style="dim")
+        instructions.append("Enter: View Details  ", style="dim")
         instructions.append("Numbers: Direct select  ", style="dim")
         instructions.append("b/q: Back", style="dim")
         
@@ -228,25 +228,13 @@ def display_playlists_table(playlists: List[Dict[str, Any]], title: str = "Playl
             return
         selected_index = (selected_index + direction) % len(playlists)
     
-    def _show_playlist_tracks() -> None:
-        """Show tracks for the selected playlist."""
+    def _show_playlist_details() -> None:
+        """Show details for the selected playlist."""
         if 0 <= selected_index < len(playlists):
-            playlist = playlists[selected_index]
             console.clear()
-            
-            # Display playlist info
-            console.print(f"[bold blue]Playlist: {playlist.get('name', 'Unknown')}[/bold blue]")
-            if playlist.get('description'):
-                console.print(f"[dim]{playlist.get('description')}[/dim]")
-            console.print(f"[dim]Tracks: {playlist.get('tracks_count', 0)} | Public: {'Yes' if playlist.get('public', False) else 'No'}[/dim]\n")
-            
-            # Show tracks if available
-            if 'tracks' in playlist and playlist['tracks']:
-                display_tracks_table(playlist['tracks'], f"Tracks from {playlist.get('name', 'Playlist')}")
-            else:
-                console.print("[yellow]No tracks available for this playlist[/yellow]")
-                console.print("\n[dim]Press Enter to return to playlist list...[/dim]")
-                input()
+            display_playlist_details(playlists[selected_index])
+            console.print("\n[dim]Press Enter to return to playlist list...[/dim]")
+            input()
     
     def _handle_input() -> None:
         """Handle keyboard input."""
@@ -261,16 +249,16 @@ def display_playlists_table(playlists: List[Dict[str, Any]], title: str = "Playl
             elif char in ['s', 'j', 'd', 'down']:  # Down
                 _move_selection(1)
             elif char in ['\r', '\n', 'right']:  # Enter
-                _show_playlist_tracks()
+                _show_playlist_details()
             elif char == ' ':  # Space
-                _show_playlist_tracks()
+                _show_playlist_details()
             else:
                 # Check for numeric shortcuts
                 try:
                     index = int(char) - 1
                     if 0 <= index < len(playlists):
                         selected_index = index
-                        _show_playlist_tracks()
+                        _show_playlist_details()
                 except ValueError:
                     pass
                     
@@ -290,203 +278,167 @@ def display_playlists_table(playlists: List[Dict[str, Any]], title: str = "Playl
         pass
 
 
-def display_albums_table(albums: List[Dict[str, Any]], title: str = "Albums") -> None:
-    """
-    Display albums in a formatted table.
-    
-    Args:
-        albums: List of album dictionaries
-        title: Table title
-    """
-    if not albums:
-        console.print("[yellow]No albums found[/yellow]")
-        return
-    
-    table = Table(title=title, show_header=True, header_style="bold blue")
-    table.add_column("#", width=3)
-    table.add_column("Album", width=30)
-    table.add_column("Artists", width=25)
-    table.add_column("Release Date", width=12)
-    table.add_column("Tracks", width=8)
-    table.add_column("Type", width=10)
-    
-    for i, album in enumerate(albums, 1):
-        # Format artists
-        artists = ", ".join(album.get('artists', []))
-        
-        # Format release date
-        release_date = album.get('release_date', '')
-        if len(release_date) > 10:
-            release_date = release_date[:10]  # Keep only YYYY-MM-DD part
-        
-        table.add_row(
-            str(i),
-            album.get('name', 'Unknown'),
-            artists,
-            release_date,
-            str(album.get('total_tracks', 0)),
-            album.get('album_type', 'album').title()
-        )
-    
-    console.print(table)
-
-
-def display_artists_table(artists: List[Dict[str, Any]], title: str = "Artists") -> None:
-    """
-    Display artists in a formatted table.
-    
-    Args:
-        artists: List of artist dictionaries
-        title: Table title
-    """
-    if not artists:
-        console.print("[yellow]No artists found[/yellow]")
-        return
-    
-    table = Table(title=title, show_header=True, header_style="bold blue")
-    table.add_column("#", width=3)
-    table.add_column("Artist", width=30)
-    table.add_column("Genres", width=30)
-    table.add_column("Followers", width=12)
-    table.add_column("Popularity", width=10)
-    
-    for i, artist in enumerate(artists, 1):
-        # Format genres
-        genres = ", ".join(artist.get('genres', []))
-        if len(genres) > 27:
-            genres = genres[:27] + "..."
-        
-        # Format followers
-        followers = artist.get('followers', 0)
-        if followers >= 1000000:
-            followers_str = f"{followers / 1000000:.1f}M"
-        elif followers >= 1000:
-            followers_str = f"{followers / 1000:.1f}K"
-        else:
-            followers_str = str(followers)
-        
-        # Format popularity
-        popularity = artist.get('popularity', 0)
-        popularity_bar = "█" * (popularity // 10) + "░" * (10 - popularity // 10)
-        
-        table.add_row(
-            str(i),
-            artist.get('name', 'Unknown'),
-            genres or "N/A",
-            followers_str,
-            f"{popularity} {popularity_bar}"
-        )
-    
-    console.print(table)
-
-
 def display_track_details(track: Dict[str, Any]) -> None:
     """
-    Display detailed information about a single track.
+    Display detailed information about a track.
     
     Args:
         track: Track dictionary
     """
-    table = Table(title=f"Track Details: {track.get('name', 'Unknown')}", show_header=False)
-    table.add_column("Property", style="bold", width=15)
-    table.add_column("Value", width=50)
+    table = Table(title="Track Details", show_header=False, box=None)
+    table.add_column("Property", style="bold cyan")
+    table.add_column("Value", style="white")
     
     # Basic info
     table.add_row("Title", track.get('name', 'Unknown'))
     table.add_row("Artists", ", ".join(track.get('artists', [])))
     table.add_row("Album", track.get('album', 'Unknown'))
     
-    # Duration
+    # Format duration
     duration_ms = track.get('duration_ms', 0)
     duration_min = duration_ms // 60000
     duration_sec = (duration_ms % 60000) // 1000
-    table.add_row("Duration", f"{duration_min}:{duration_sec:02d}")
+    duration_str = f"{duration_min}:{duration_sec:02d}"
+    table.add_row("Duration", duration_str)
     
-    # Additional info
-    if 'popularity' in track:
-        table.add_row("Popularity", str(track['popularity']))
-    if 'explicit' in track:
-        table.add_row("Explicit", "Yes" if track['explicit'] else "No")
-    if 'track_number' in track:
-        table.add_row("Track Number", str(track['track_number']))
-    if 'disc_number' in track:
-        table.add_row("Disc Number", str(track['disc_number']))
-    if 'preview_url' in track and track['preview_url']:
-        table.add_row("Preview", "Available")
-    if 'external_url' in track:
-        table.add_row("Spotify URL", track['external_url'])
+    # Popularity with bar
+    popularity = track.get('popularity', 0)
+    popularity_bar = "█" * (popularity // 10) + "░" * (10 - popularity // 10)
+    table.add_row("Popularity", f"{popularity}/100 {popularity_bar}")
     
-    console.print(table)
+    # Additional details
+    if track.get('explicit'):
+        table.add_row("Explicit", "Yes")
+    
+    if track.get('track_number'):
+        table.add_row("Track Number", str(track.get('track_number')))
+    
+    if track.get('disc_number') and track.get('disc_number') > 1:
+        table.add_row("Disc Number", str(track.get('disc_number')))
+    
+    if track.get('external_url'):
+        table.add_row("Spotify URL", track.get('external_url'))
+    
+    if track.get('preview_url'):
+        table.add_row("Preview Available", "Yes")
+    
+    panel = Panel(
+        table,
+        title="[bold blue]Track Information[/bold blue]",
+        border_style="blue",
+        padding=(1, 2)
+    )
+    
+    console.print(panel)
+
+
+def display_playlist_details(playlist: Dict[str, Any]) -> None:
+    """
+    Display detailed information about a playlist.
+    
+    Args:
+        playlist: Playlist dictionary
+    """
+    table = Table(title="Playlist Details", show_header=False, box=None)
+    table.add_column("Property", style="bold cyan")
+    table.add_column("Value", style="white")
+    
+    # Basic info
+    table.add_row("Name", playlist.get('name', 'Unknown'))
+    table.add_row("Description", playlist.get('description', 'No description'))
+    table.add_row("Owner", playlist.get('owner', 'Unknown'))
+    table.add_row("Tracks", str(playlist.get('tracks_count', 0)))
+    table.add_row("Public", "Yes" if playlist.get('public', False) else "No")
+    table.add_row("Collaborative", "Yes" if playlist.get('collaborative', False) else "No")
+    
+    if playlist.get('followers'):
+        table.add_row("Followers", str(playlist.get('followers')))
+    
+    if playlist.get('external_url'):
+        table.add_row("Spotify URL", playlist.get('external_url'))
+    
+    panel = Panel(
+        table,
+        title="[bold blue]Playlist Information[/bold blue]",
+        border_style="blue",
+        padding=(1, 2)
+    )
+    
+    console.print(panel)
 
 
 def display_album_details(album: Dict[str, Any]) -> None:
     """
-    Display detailed information about a single album.
+    Display detailed information about an album.
     
     Args:
         album: Album dictionary
     """
-    table = Table(title=f"Album Details: {album.get('name', 'Unknown')}", show_header=False)
-    table.add_column("Property", style="bold", width=15)
-    table.add_column("Value", width=50)
+    table = Table(title="Album Details", show_header=False, box=None)
+    table.add_column("Property", style="bold cyan")
+    table.add_column("Value", style="white")
     
     # Basic info
-    table.add_row("Album", album.get('name', 'Unknown'))
+    table.add_row("Name", album.get('name', 'Unknown'))
     table.add_row("Artists", ", ".join(album.get('artists', [])))
     table.add_row("Release Date", album.get('release_date', 'Unknown'))
     table.add_row("Total Tracks", str(album.get('total_tracks', 0)))
-    table.add_row("Album Type", album.get('album_type', 'album').title())
+    table.add_row("Album Type", album.get('album_type', 'Unknown'))
     
-    # Additional info
-    if 'genres' in album and album['genres']:
-        table.add_row("Genres", ", ".join(album['genres']))
-    if 'label' in album:
-        table.add_row("Label", album['label'])
-    if 'popularity' in album:
-        table.add_row("Popularity", str(album['popularity']))
-    if 'external_url' in album:
-        table.add_row("Spotify URL", album['external_url'])
+    if album.get('genres'):
+        table.add_row("Genres", ", ".join(album.get('genres')))
     
-    console.print(table)
+    if album.get('label'):
+        table.add_row("Label", album.get('label'))
     
-    # Display tracks if available
-    if 'tracks' in album and album['tracks']:
-        console.print("\n[bold]Album Tracks:[/bold]")
-        display_tracks_table(album['tracks'], f"Tracks from {album.get('name', 'Album')}")
+    if album.get('popularity'):
+        popularity = album.get('popularity', 0)
+        popularity_bar = "█" * (popularity // 10) + "░" * (10 - popularity // 10)
+        table.add_row("Popularity", f"{popularity}/100 {popularity_bar}")
+    
+    if album.get('external_url'):
+        table.add_row("Spotify URL", album.get('external_url'))
+    
+    panel = Panel(
+        table,
+        title="[bold blue]Album Information[/bold blue]",
+        border_style="blue",
+        padding=(1, 2)
+    )
+    
+    console.print(panel)
 
 
 def display_artist_details(artist: Dict[str, Any]) -> None:
     """
-    Display detailed information about a single artist.
+    Display detailed information about an artist.
     
     Args:
         artist: Artist dictionary
     """
-    table = Table(title=f"Artist Details: {artist.get('name', 'Unknown')}", show_header=False)
-    table.add_column("Property", style="bold", width=15)
-    table.add_column("Value", width=50)
+    table = Table(title="Artist Details", show_header=False, box=None)
+    table.add_column("Property", style="bold cyan")
+    table.add_column("Value", style="white")
     
     # Basic info
-    table.add_row("Artist", artist.get('name', 'Unknown'))
-    table.add_row("Popularity", str(artist.get('popularity', 0)))
+    table.add_row("Name", artist.get('name', 'Unknown'))
+    table.add_row("Followers", f"{artist.get('followers', 0):,}")
     
-    # Followers
-    followers = artist.get('followers', 0)
-    if followers >= 1000000:
-        followers_str = f"{followers:,} ({followers / 1000000:.1f}M)"
-    elif followers >= 1000:
-        followers_str = f"{followers:,} ({followers / 1000:.1f}K)"
-    else:
-        followers_str = f"{followers:,}"
-    table.add_row("Followers", followers_str)
+    if artist.get('genres'):
+        table.add_row("Genres", ", ".join(artist.get('genres')))
     
-    # Genres
-    if 'genres' in artist and artist['genres']:
-        table.add_row("Genres", ", ".join(artist['genres']))
-    else:
-        table.add_row("Genres", "N/A")
+    popularity = artist.get('popularity', 0)
+    popularity_bar = "█" * (popularity // 10) + "░" * (10 - popularity // 10)
+    table.add_row("Popularity", f"{popularity}/100 {popularity_bar}")
     
-    if 'external_url' in artist:
-        table.add_row("Spotify URL", artist['external_url'])
+    if artist.get('external_url'):
+        table.add_row("Spotify URL", artist.get('external_url'))
     
-    console.print(table) 
+    panel = Panel(
+        table,
+        title="[bold blue]Artist Information[/bold blue]",
+        border_style="blue",
+        padding=(1, 2)
+    )
+    
+    console.print(panel) 

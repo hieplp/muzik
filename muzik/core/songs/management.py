@@ -337,7 +337,7 @@ def add_tracks_to_spotify_playlist(playlist: Dict[str, Any], config: Config) -> 
                 if query:
                     tracks = spotify.search_tracks(query, limit=10)
                     if tracks:
-                        from ..spotify.display import display_tracks_table
+                        from ...utils.spotify_display import display_tracks_table
                         display_tracks_table(tracks, f"Search results for '{query}'")
                         
                         try:
@@ -356,7 +356,7 @@ def add_tracks_to_spotify_playlist(playlist: Dict[str, Any], config: Config) -> 
                 library = library_manager.load_library()
                 
                 if library["tracks"]:
-                    from ..spotify.display import display_tracks_table
+                    from ...utils.spotify_display import display_tracks_table
                     display_tracks_table(library["tracks"][:20], "Your Library (first 20)")
                     
                     try:

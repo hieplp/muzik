@@ -11,7 +11,7 @@ from rich.table import Table
 from ..config import Config
 from ..spotify.auth import validate_spotify_config
 from ..spotify.client import SpotifyAPI
-from ..spotify.display import display_tracks_table
+from ...utils.spotify_display import display_tracks_table
 
 console = Console()
 

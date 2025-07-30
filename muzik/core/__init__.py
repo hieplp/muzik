@@ -11,9 +11,10 @@ from .about import show_about_menu
 
 # Import new Spotify modules
 from .spotify import (
-    SpotifyAuth, SpotifyTracks, SpotifyAlbums, SpotifyArtists, 
-    SpotifyPlaylists, SpotifyClient, display_tracks_table, display_playlists_table
+    SpotifyAuth, SpotifyTracks, SpotifyAlbums, SpotifyArtists,
+    SpotifyPlaylists, SpotifyClient
 )
+from ..utils.spotify_display import display_tracks_table, display_playlists_table
 
 # Import legacy compatibility
 from .spotify.client import SpotifyAPI

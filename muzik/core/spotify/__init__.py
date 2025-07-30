@@ -8,7 +8,7 @@ from .albums import SpotifyAlbums
 from .artists import SpotifyArtists
 from .playlists import SpotifyPlaylists
 from .client import SpotifyClient
-from .display import display_tracks_table, display_playlists_table
+from .base import BaseSpotifyAPI, SpotifyDataTransformer
 
 __all__ = [
     'SpotifyAuth',
@@ -17,6 +17,6 @@ __all__ = [
     'SpotifyArtists',
     'SpotifyPlaylists',
     'SpotifyClient',
-    'display_tracks_table',
-    'display_playlists_table'
+    'BaseSpotifyAPI',
+    'SpotifyDataTransformer'
 ] 
