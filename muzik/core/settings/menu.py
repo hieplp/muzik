@@ -5,6 +5,8 @@ Settings menu functionality.
 from rich.console import Console
 from rich.prompt import Confirm, Prompt
 from rich.panel import Panel
+from rich.tree import Tree
+from rich.table import Table
 
 from ..config import Config
 from ..spotify.api.auth import SpotifyAuth, validate_spotify_config
@@ -40,15 +42,37 @@ def configure_spotify_tokens(config: Config) -> None:
     console.print(f"Access Token: {'[green]Set[/green]' if status['access_token_set'] else '[red]Not set[/red]'}")
     console.print(f"Refresh Token: {'[green]Set[/green]' if status['refresh_token_set'] else '[red]Not set[/red]'}")
     
-    # Ask what to configure
-    console.print("\n[bold]What would you like to configure?[/bold]")
-    console.print("1. Client ID and Client Secret")
-    console.print("2. Access Token and Refresh Token")
-    console.print("3. All settings")
-    console.print("4. Clear all Spotify settings")
-    console.print("5. Back to menu")
+    # Create rich choice menu
+    from muzik.utils.input_utils import rich_choice_menu
     
-    choice = Prompt.ask("Choose an option", choices=["1", "2", "3", "4", "5"])
+    choices = [
+        "Client ID and Client Secret",
+        "Access Token and Refresh Token", 
+        "All settings",
+        "Clear all Spotify settings",
+        "Back to menu"
+    ]
+    
+    descriptions = [
+        "Configure app credentials from Spotify Developer Dashboard",
+        "Configure OAuth tokens for API access",
+        "Configure all Spotify settings at once",
+        "Remove all stored Spotify configuration",
+        "Return to previous menu"
+    ]
+    
+    console.print("\n[bold]Spotify Configuration Options[/bold]")
+    choice_text = rich_choice_menu(
+        "What would you like to configure?",
+        choices,
+        descriptions,
+        show_quit=False
+    )
+    
+    if not choice_text:
+        return
+        
+    choice = str(choices.index(choice_text) + 1)
     
     if choice == "1":
         _configure_client_credentials(auth)
@@ -64,58 +88,47 @@ def configure_spotify_tokens(config: Config) -> None:
 
 
 def show_spotify_status(config: Config) -> None:
-    """Show Spotify API status."""
+    """Show Spotify API status with enhanced Rich display."""
+    from muzik.utils.display import display_key_value_table, create_info_panel
+    from muzik.utils.input_utils import pause_for_user
+    
     auth = SpotifyAuth(config)
-    
-    console.print(Panel(
-        "[bold blue]Spotify API Status[/bold blue]",
-        title="🎵 Configuration Status",
-        border_style="blue"
-    ))
-    
     status = auth.get_status()
     
-    # Check configuration status
-    if not status['configured']:
-        console.print("[red]✗ Spotify API is not configured[/red]")
-        console.print("[yellow]Please configure your Client ID and Client Secret first[/yellow]")
-            # Add a pause so user can see the output
-    console.print("\n[dim]Press Enter to continue...[/dim]")
-    try:
-        input()
-    except KeyboardInterrupt:
-        # Re-raise to allow proper handling at higher levels
-        raise
-        return
+    # Create status data for table
+    status_data = {
+        "Configuration Status": "✓ Configured" if status['configured'] else "✗ Not Configured",
+        "Client ID": status['client_id'] if status['client_id'] else "Not set",
+        "Client Secret": "Set" if status['client_secret_set'] else "Not set", 
+        "Access Token": "Set" if status['access_token_set'] else "Not set",
+        "Refresh Token": "Set" if status['refresh_token_set'] else "Not set"
+    }
     
-    console.print("[green]✓ Spotify API is configured[/green]")
-    console.print(f"Client ID: {status['client_id']}" if status['client_id'] else "[red]Not set[/red]")
-    console.print(f"Client Secret: {'[green]Set[/green]' if status['client_secret_set'] else '[red]Not set[/red]'}")
-    console.print(f"Access Token: {'[green]Set[/green]' if status['access_token_set'] else '[red]Not set[/red]'}")
-    console.print(f"Refresh Token: {'[green]Set[/green]' if status['refresh_token_set'] else '[red]Not set[/red]'}")
+    # Display status table
+    display_key_value_table(status_data, "Spotify API Configuration Status")
     
     # Test API connection if possible
     if status['configured']:
+        console.print("\n[bold]Testing API Connection...[/bold]")
         success, error = auth.test_connection()
         if success:
             console.print("[green]✓ API connection test successful![/green]")
         else:
             console.print(f"[red]✗ API connection test failed: {error}[/red]")
+    else:
+        console.print("\n[yellow]⚠️  Configure Client ID and Client Secret to enable API features[/yellow]")
     
-    # Add a pause so user can see the output
-    console.print("\n[dim]Press Enter to continue...[/dim]")
-    try:
-        input()
-    except KeyboardInterrupt:
-        # Re-raise to allow proper handling at higher levels
-        raise
+    pause_for_user()
 
 
 def _configure_client_credentials(auth: SpotifyAuth) -> None:
-    """Configure Spotify client ID and secret."""
+    """Configure Spotify client ID and secret with enhanced prompts."""
+    from muzik.utils.input_utils import rich_prompt, rich_confirm
+    
     console.print(Panel(
         "[bold blue]Spotify Client Credentials[/bold blue]\n\n"
-        "Enter your Spotify app credentials from the Developer Dashboard.",
+        "Enter your Spotify app credentials from the Developer Dashboard.\n"
+        "Get these from: https://developer.spotify.com/dashboard",
         title="🔑 Client Setup",
         border_style="blue"
     ))
@@ -123,22 +136,22 @@ def _configure_client_credentials(auth: SpotifyAuth) -> None:
     status = auth.get_status()
     
     if status['client_id_set']:
-        console.print(f"Current Client ID: {status['client_id']}")
-        if not Confirm.ask("Do you want to update the Client ID?"):
+        console.print(f"Current Client ID: [dim]{status['client_id']}[/dim]")
+        if not rich_confirm("Do you want to update the Client ID?"):
             client_id = auth.client_id
         else:
-            client_id = Prompt.ask("Enter your Spotify Client ID")
+            client_id = rich_prompt("Enter your Spotify Client ID")
     else:
-        client_id = Prompt.ask("Enter your Spotify Client ID")
+        client_id = rich_prompt("Enter your Spotify Client ID")
     
     if status['client_secret_set']:
-        console.print("Current Client Secret: [hidden]")
-        if not Confirm.ask("Do you want to update the Client Secret?"):
+        console.print("Current Client Secret: [dim][hidden][/dim]")
+        if not rich_confirm("Do you want to update the Client Secret?"):
             client_secret = auth.client_secret
         else:
-            client_secret = Prompt.ask("Enter your Spotify Client Secret", password=True)
+            client_secret = rich_prompt("Enter your Spotify Client Secret", password=True)
     else:
-        client_secret = Prompt.ask("Enter your Spotify Client Secret", password=True)
+        client_secret = rich_prompt("Enter your Spotify Client Secret", password=True)
     
     # Save credentials
     auth.set_credentials(client_id, client_secret)
@@ -146,33 +159,36 @@ def _configure_client_credentials(auth: SpotifyAuth) -> None:
 
 
 def _configure_access_tokens(auth: SpotifyAuth) -> None:
-    """Configure access and refresh tokens."""
+    """Configure access and refresh tokens with enhanced prompts."""
+    from muzik.utils.input_utils import rich_prompt, rich_confirm
+    
     console.print(Panel(
         "[bold blue]Spotify Access Tokens[/bold blue]\n\n"
-        "Enter your Spotify access tokens. You can generate these using OAuth flow.",
-        title="🎫 Token Setup",
+        "Enter your Spotify access tokens. You can generate these using OAuth flow.\n"
+        "These tokens provide access to your Spotify account data.",
+        title="🎫 Token Setup", 
         border_style="blue"
     ))
     
     status = auth.get_status()
     
     if status['access_token_set']:
-        console.print("Current Access Token: [hidden]")
-        if not Confirm.ask("Do you want to update the Access Token?"):
+        console.print("Current Access Token: [dim][hidden][/dim]")
+        if not rich_confirm("Do you want to update the Access Token?"):
             access_token = auth.access_token
         else:
-            access_token = Prompt.ask("Enter your Spotify Access Token", password=True)
+            access_token = rich_prompt("Enter your Spotify Access Token", password=True)
     else:
-        access_token = Prompt.ask("Enter your Spotify Access Token", password=True)
+        access_token = rich_prompt("Enter your Spotify Access Token", password=True)
     
     if status['refresh_token_set']:
-        console.print("Current Refresh Token: [hidden]")
-        if not Confirm.ask("Do you want to update the Refresh Token?"):
+        console.print("Current Refresh Token: [dim][hidden][/dim]")
+        if not rich_confirm("Do you want to update the Refresh Token?"):
             refresh_token = auth.refresh_token
         else:
-            refresh_token = Prompt.ask("Enter your Spotify Refresh Token (optional)", default="", password=True)
+            refresh_token = rich_prompt("Enter your Spotify Refresh Token (optional)", default="", password=True)
     else:
-        refresh_token = Prompt.ask("Enter your Spotify Refresh Token (optional)", default="", password=True)
+        refresh_token = rich_prompt("Enter your Spotify Refresh Token (optional)", default="", password=True)
     
     # Save tokens
     auth.set_tokens(access_token, refresh_token if refresh_token else None)
@@ -180,13 +196,31 @@ def _configure_access_tokens(auth: SpotifyAuth) -> None:
 
 
 def _clear_spotify_settings(auth: SpotifyAuth) -> None:
-    """Clear all Spotify settings."""
-    if not Confirm.ask("Are you sure you want to clear all Spotify settings?"):
-        console.print("[yellow]Clear cancelled[/yellow]")
+    """Clear all Spotify settings with enhanced confirmation."""
+    from muzik.utils.input_utils import rich_confirm
+    
+    console.print(Panel(
+        "[bold red]⚠️  Clear All Spotify Settings[/bold red]\n\n"
+        "This will remove all stored Spotify configuration:\n"
+        "• Client ID and Client Secret\n"
+        "• Access Token and Refresh Token\n"
+        "• All API access will be disabled\n\n"
+        "[bold]This action cannot be undone![/bold]",
+        title="🗑️  Confirm Deletion",
+        border_style="red"
+    ))
+    
+    if not rich_confirm("Are you sure you want to clear all Spotify settings?", default=False):
+        console.print("[yellow]Clear operation cancelled[/yellow]")
+        return
+    
+    # Double confirmation for destructive action
+    if not rich_confirm("This will permanently delete your settings. Continue?", default=False):
+        console.print("[yellow]Clear operation cancelled[/yellow]")
         return
     
     auth.clear_settings()
-    console.print("[green]✓ All Spotify settings cleared![/green]")
+    console.print("[green]✓ All Spotify settings cleared successfully![/green]")
 
 
 def show_settings_menu() -> None:
