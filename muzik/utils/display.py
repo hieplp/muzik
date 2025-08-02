@@ -2,23 +2,22 @@
 Enhanced display utilities for rich console output with advanced Rich features.
 """
 
-from typing import Any, Dict, List, Optional, Union
 import time
+from typing import Any, Dict, List, Optional, Union
 
-from rich.console import Console
-from rich.panel import Panel
-from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TimeRemainingColumn
-from rich.table import Table
-from rich.text import Text
-from rich.layout import Layout
-from rich.live import Live
-from rich.status import Status
-from rich.tree import Tree
-from rich.columns import Columns
-from rich.markdown import Markdown
-from rich.syntax import Syntax
 from rich.align import Align
 from rich.box import ROUNDED
+from rich.columns import Columns
+from rich.console import Console
+from rich.layout import Layout
+from rich.markdown import Markdown
+from rich.panel import Panel
+from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TimeRemainingColumn
+from rich.status import Status
+from rich.syntax import Syntax
+from rich.table import Table
+from rich.text import Text
+from rich.tree import Tree
 
 console = Console()
 
@@ -143,9 +142,9 @@ def print_header(text: str, level: int = 1) -> None:
 
 
 def display_tree(
-    root_name: str,
-    data: Dict[str, Any],
-    expanded: bool = True
+        root_name: str,
+        data: Dict[str, Any],
+        expanded: bool = True
 ) -> None:
     """
     Display hierarchical data as a tree structure.
@@ -156,7 +155,7 @@ def display_tree(
         expanded: Whether to show tree expanded
     """
     tree = Tree(f"[bold blue]{root_name}[/bold blue]", expanded=expanded)
-    
+
     def add_node(parent_tree: Tree, node_data: Any, name: str = "") -> None:
         if isinstance(node_data, dict):
             for key, value in node_data.items():
@@ -174,16 +173,16 @@ def display_tree(
                     parent_tree.add(f"[yellow][{i}][/yellow] [white]{item}[/white]")
         else:
             parent_tree.add(f"[white]{node_data}[/white]")
-    
+
     add_node(tree, data)
     console.print(tree)
 
 
 def display_columns(
-    items: List[str],
-    title: Optional[str] = None,
-    equal_width: bool = False,
-    min_width: int = 12
+        items: List[str],
+        title: Optional[str] = None,
+        equal_width: bool = False,
+        min_width: int = 12
 ) -> None:
     """
     Display items in columns.
@@ -196,16 +195,16 @@ def display_columns(
     """
     if title:
         console.print(f"[bold blue]{title}[/bold blue]\n")
-    
+
     # Create styled items
     styled_items = [Text(str(item), style="cyan") for item in items]
-    
+
     columns = Columns(
         styled_items,
         equal=equal_width,
         width=min_width if equal_width else None
     )
-    
+
     console.print(columns)
 
 
@@ -219,17 +218,17 @@ def display_markdown(content: str, title: Optional[str] = None) -> None:
     """
     if title:
         console.print(f"[bold blue]{title}[/bold blue]\n")
-    
+
     markdown = Markdown(content)
     console.print(markdown)
 
 
 def display_syntax(
-    code: str,
-    language: str = "python",
-    theme: str = "monokai",
-    line_numbers: bool = True,
-    title: Optional[str] = None
+        code: str,
+        language: str = "python",
+        theme: str = "monokai",
+        line_numbers: bool = True,
+        title: Optional[str] = None
 ) -> None:
     """
     Display code with syntax highlighting.
@@ -247,7 +246,7 @@ def display_syntax(
         theme=theme,
         line_numbers=line_numbers
     )
-    
+
     if title:
         panel = Panel(
             syntax,
@@ -271,7 +270,7 @@ def create_layout(sections: Dict[str, Any]) -> Layout:
         Rich Layout object
     """
     layout = Layout()
-    
+
     if len(sections) == 1:
         name, content = next(iter(sections.items()))
         layout.update(content)
@@ -308,7 +307,7 @@ def create_layout(sections: Dict[str, Any]) -> Layout:
         layout["left"].update(sections[names[1]])
         layout["right"].update(sections[names[2]])
         layout["footer"].update(sections[names[3]])
-    
+
     return layout
 
 
@@ -320,18 +319,17 @@ def live_progress_demo(duration: int = 10) -> None:
         duration: Duration in seconds
     """
     with Progress(
-        SpinnerColumn(),
-        TextColumn("[progress.description]{task.description}"),
-        BarColumn(),
-        TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
-        TimeRemainingColumn(),
-        console=console,
+            SpinnerColumn(),
+            TextColumn("[progress.description]{task.description}"),
+            BarColumn(),
+            TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
+            TimeRemainingColumn(),
+            console=console,
     ) as progress:
-        
         task1 = progress.add_task("[red]Downloading...", total=100)
         task2 = progress.add_task("[green]Processing...", total=100)
         task3 = progress.add_task("[cyan]Uploading...", total=100)
-        
+
         for i in range(duration * 10):
             time.sleep(0.1)
             progress.update(task1, advance=1.0)
@@ -352,10 +350,10 @@ def status_spinner(message: str, duration: int = 3) -> None:
 
 
 def create_info_panel(
-    title: str,
-    content: Union[str, Text, Table],
-    style: str = "blue",
-    padding: tuple = (1, 2)
+        title: str,
+        content: Union[str, Text, Table],
+        style: str = "blue",
+        padding: tuple = (1, 2)
 ) -> Panel:
     """
     Create a styled information panel.
@@ -379,10 +377,10 @@ def create_info_panel(
 
 
 def display_key_value_table(
-    data: Dict[str, Any],
-    title: str = "Information",
-    key_style: str = "cyan",
-    value_style: str = "white"
+        data: Dict[str, Any],
+        title: str = "Information",
+        key_style: str = "cyan",
+        value_style: str = "white"
 ) -> None:
     """
     Display key-value pairs in a formatted table.
@@ -396,7 +394,7 @@ def display_key_value_table(
     table = Table(title=f"[bold blue]{title}[/bold blue]", box=ROUNDED)
     table.add_column("Property", style=key_style, width=20)
     table.add_column("Value", style=value_style, width=40)
-    
+
     for key, value in data.items():
         # Handle different value types
         if isinstance(value, bool):
@@ -410,7 +408,7 @@ def display_key_value_table(
             table.add_row(key, "[dim]Not set[/dim]")
         else:
             table.add_row(key, str(value))
-    
+
     console.print(table)
 
 

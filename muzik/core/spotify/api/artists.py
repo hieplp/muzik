@@ -4,13 +4,12 @@ Spotify artists API operations.
 
 from typing import Any, Dict, List, Optional
 
-from ...config import Config
 from .base import BaseSpotifyAPI, SpotifyDataTransformer
 
 
 class SpotifyArtists(BaseSpotifyAPI):
     """Handles Spotify artist operations."""
-    
+
     def search_artists(self, query: str, limit: int = 10) -> List[Dict[str, Any]]:
         """
         Search for artists on Spotify.
@@ -28,7 +27,7 @@ class SpotifyArtists(BaseSpotifyAPI):
             limit=limit,
             transform_func=SpotifyDataTransformer.transform_artist
         )
-    
+
     def get_artist(self, artist_id: str) -> Optional[Dict[str, Any]]:
         """
         Get detailed information about a specific artist.
@@ -42,16 +41,16 @@ class SpotifyArtists(BaseSpotifyAPI):
         data = self._make_api_call("GET", f"/artists/{artist_id}", default_return=None)
         if not data:
             return None
-        
+
         return SpotifyDataTransformer.transform_artist(data)
-    
+
     def get_artist_albums(
-        self, 
-        artist_id: str, 
-        include_groups: Optional[str] = None,
-        limit: int = 20,
-        offset: int = 0,
-        market: Optional[str] = None
+            self,
+            artist_id: str,
+            include_groups: Optional[str] = None,
+            limit: int = 20,
+            offset: int = 0,
+            market: Optional[str] = None
     ) -> List[Dict[str, Any]]:
         """
         Get albums for a specific artist.
@@ -71,7 +70,7 @@ class SpotifyArtists(BaseSpotifyAPI):
             params["include_groups"] = include_groups
         if market:
             params["market"] = market
-        
+
         def transform_artist_album(album: Dict[str, Any]) -> Dict[str, Any]:
             """Transform artist album data."""
             return {
@@ -83,7 +82,7 @@ class SpotifyArtists(BaseSpotifyAPI):
                 'external_url': album['external_urls']['spotify'],
                 'images': album.get('images', [])
             }
-        
+
         return self._get_paginated_items(
             endpoint=f"/artists/{artist_id}/albums",
             limit=limit,
@@ -92,7 +91,7 @@ class SpotifyArtists(BaseSpotifyAPI):
             params=params,
             transform_func=transform_artist_album
         )
-    
+
     def get_artist_top_tracks(self, artist_id: str, market: str = "US") -> List[Dict[str, Any]]:
         """
         Get top tracks for a specific artist.
@@ -105,15 +104,15 @@ class SpotifyArtists(BaseSpotifyAPI):
             List of track information
         """
         data = self._make_api_call(
-            "GET", 
-            f"/artists/{artist_id}/top-tracks", 
+            "GET",
+            f"/artists/{artist_id}/top-tracks",
             params={"market": market},
             default_return={}
         )
-        
+
         if not data:
             return []
-        
+
         tracks = []
         for track in data.get('tracks', []):
             track_info = {
@@ -126,9 +125,9 @@ class SpotifyArtists(BaseSpotifyAPI):
                 'preview_url': track.get('preview_url')
             }
             tracks.append(track_info)
-        
+
         return tracks
-    
+
     def get_related_artists(self, artist_id: str) -> List[Dict[str, Any]]:
         """
         Get artists related to a specific artist.
@@ -140,17 +139,17 @@ class SpotifyArtists(BaseSpotifyAPI):
             List of related artist information
         """
         data = self._make_api_call(
-            "GET", 
+            "GET",
             f"/artists/{artist_id}/related-artists",
             default_return={}
         )
-        
+
         if not data:
             return []
-        
+
         artists = data.get('artists', [])
         return [SpotifyDataTransformer.transform_artist(artist) for artist in artists]
-    
+
     def get_multiple_artists(self, artist_ids: List[str]) -> List[Dict[str, Any]]:
         """
         Get information about multiple artists.
@@ -167,7 +166,7 @@ class SpotifyArtists(BaseSpotifyAPI):
             max_ids=50,
             transform_func=SpotifyDataTransformer.transform_artist
         )
-    
+
     def get_user_top_artists(self, limit: int = 20, time_range: str = "medium_term") -> List[Dict[str, Any]]:
         """
         Get user's top artists.
@@ -180,11 +179,11 @@ class SpotifyArtists(BaseSpotifyAPI):
             List of artist information
         """
         params = {"time_range": time_range}
-        
+
         return self._get_paginated_items(
             endpoint="/me/top/artists",
             limit=limit,
             max_limit=50,
             params=params,
             transform_func=SpotifyDataTransformer.transform_artist
-        ) 
+        )

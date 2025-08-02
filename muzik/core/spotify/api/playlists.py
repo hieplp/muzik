@@ -4,13 +4,12 @@ Spotify playlists API operations.
 
 from typing import Any, Dict, List, Optional
 
-from ...config import Config
 from .base import BaseSpotifyAPI, SpotifyDataTransformer
 
 
 class SpotifyPlaylists(BaseSpotifyAPI):
     """Handles Spotify playlist operations."""
-    
+
     def search_playlists(self, query: str, limit: int = 10) -> List[Dict[str, Any]]:
         """
         Search for playlists on Spotify.
@@ -28,7 +27,7 @@ class SpotifyPlaylists(BaseSpotifyAPI):
             limit=limit,
             transform_func=SpotifyDataTransformer.transform_playlist
         )
-    
+
     def get_user_playlists(self, limit: int = 50, offset: int = 0) -> List[Dict[str, Any]]:
         """
         Get current user's playlists.
@@ -47,7 +46,7 @@ class SpotifyPlaylists(BaseSpotifyAPI):
             offset=offset,
             transform_func=SpotifyDataTransformer.transform_playlist
         )
-    
+
     def get_playlist(self, playlist_id: str) -> Optional[Dict[str, Any]]:
         """
         Get detailed information about a specific playlist.
@@ -61,9 +60,9 @@ class SpotifyPlaylists(BaseSpotifyAPI):
         data = self._make_api_call("GET", f"/playlists/{playlist_id}", default_return=None)
         if not data:
             return None
-        
+
         return SpotifyDataTransformer.transform_playlist(data)
-    
+
     def get_playlist_tracks(self, playlist_id: str, limit: int = 100, offset: int = 0) -> List[Dict[str, Any]]:
         """
         Get tracks from a specific playlist.
@@ -76,12 +75,13 @@ class SpotifyPlaylists(BaseSpotifyAPI):
         Returns:
             List of track information
         """
+
         def transform_playlist_track(item: Dict[str, Any]) -> Optional[Dict[str, Any]]:
             """Transform playlist track item."""
             track = item.get('track')
             if not track or track.get('type') != 'track':  # Skip episodes and other non-track items
                 return None
-            
+
             return {
                 'id': track['id'],
                 'name': track['name'],
@@ -94,26 +94,27 @@ class SpotifyPlaylists(BaseSpotifyAPI):
                 'added_at': item.get('added_at', ''),
                 'added_by': item.get('added_by', {}).get('id', '') if item.get('added_by') else ''
             }
-        
+
         data = self._make_api_call(
-            "GET", 
+            "GET",
             f"/playlists/{playlist_id}/tracks",
             params={"limit": min(limit, 100), "offset": offset},
             default_return={}
         )
-        
+
         if not data:
             return []
-        
+
         tracks = []
         for item in data.get('items', []):
             transformed = transform_playlist_track(item)
             if transformed:
                 tracks.append(transformed)
-        
+
         return tracks
-    
-    def get_featured_playlists(self, limit: int = 20, offset: int = 0, country: Optional[str] = None) -> List[Dict[str, Any]]:
+
+    def get_featured_playlists(self, limit: int = 20, offset: int = 0, country: Optional[str] = None) -> List[
+        Dict[str, Any]]:
         """
         Get featured playlists.
         
@@ -128,21 +129,22 @@ class SpotifyPlaylists(BaseSpotifyAPI):
         params = {}
         if country:
             params["country"] = country
-        
+
         data = self._make_api_call(
-            "GET", 
+            "GET",
             "/browse/featured-playlists",
             params={**params, "limit": min(limit, 50), "offset": offset},
             default_return={}
         )
-        
+
         if not data:
             return []
-        
+
         playlists = data.get('playlists', {}).get('items', [])
         return [SpotifyDataTransformer.transform_playlist(playlist) for playlist in playlists]
-    
-    def get_category_playlists(self, category_id: str, limit: int = 20, offset: int = 0, country: Optional[str] = None) -> List[Dict[str, Any]]:
+
+    def get_category_playlists(self, category_id: str, limit: int = 20, offset: int = 0,
+                               country: Optional[str] = None) -> List[Dict[str, Any]]:
         """
         Get playlists for a specific category.
         
@@ -158,16 +160,16 @@ class SpotifyPlaylists(BaseSpotifyAPI):
         params = {}
         if country:
             params["country"] = country
-        
+
         data = self._make_api_call(
-            "GET", 
+            "GET",
             f"/browse/categories/{category_id}/playlists",
             params={**params, "limit": min(limit, 50), "offset": offset},
             default_return={}
         )
-        
+
         if not data:
             return []
-        
+
         playlists = data.get('playlists', {}).get('items', [])
-        return [SpotifyDataTransformer.transform_playlist(playlist) for playlist in playlists] 
+        return [SpotifyDataTransformer.transform_playlist(playlist) for playlist in playlists]

@@ -4,13 +4,12 @@ Spotify albums API operations.
 
 from typing import Any, Dict, List, Optional
 
-from ...config import Config
 from .base import BaseSpotifyAPI, SpotifyDataTransformer
 
 
 class SpotifyAlbums(BaseSpotifyAPI):
     """Handles Spotify album operations."""
-    
+
     def search_albums(self, query: str, limit: int = 10) -> List[Dict[str, Any]]:
         """
         Search for albums on Spotify.
@@ -28,7 +27,7 @@ class SpotifyAlbums(BaseSpotifyAPI):
             limit=limit,
             transform_func=SpotifyDataTransformer.transform_album
         )
-    
+
     def get_album(self, album_id: str) -> Optional[Dict[str, Any]]:
         """
         Get detailed information about a specific album.
@@ -42,9 +41,9 @@ class SpotifyAlbums(BaseSpotifyAPI):
         data = self._make_api_call("GET", f"/albums/{album_id}", default_return=None)
         if not data:
             return None
-        
+
         album_info = SpotifyDataTransformer.transform_album(data)
-        
+
         # Add track information for detailed album view
         album_info['tracks'] = []
         for track in data.get('tracks', {}).get('items', []):
@@ -57,9 +56,9 @@ class SpotifyAlbums(BaseSpotifyAPI):
                 'explicit': track.get('explicit', False)
             }
             album_info['tracks'].append(track_info)
-        
+
         return album_info
-    
+
     def get_album_tracks(self, album_id: str, limit: int = 50, offset: int = 0) -> List[Dict[str, Any]]:
         """
         Get tracks from a specific album.
@@ -72,6 +71,7 @@ class SpotifyAlbums(BaseSpotifyAPI):
         Returns:
             List of track information
         """
+
         def transform_album_track(track: Dict[str, Any]) -> Dict[str, Any]:
             """Transform album track data."""
             return {
@@ -84,7 +84,7 @@ class SpotifyAlbums(BaseSpotifyAPI):
                 'preview_url': track.get('preview_url'),
                 'external_url': track['external_urls']['spotify']
             }
-        
+
         return self._get_paginated_items(
             endpoint=f"/albums/{album_id}/tracks",
             limit=limit,
@@ -92,7 +92,7 @@ class SpotifyAlbums(BaseSpotifyAPI):
             offset=offset,
             transform_func=transform_album_track
         )
-    
+
     def get_multiple_albums(self, album_ids: List[str]) -> List[Dict[str, Any]]:
         """
         Get information about multiple albums.
@@ -109,7 +109,7 @@ class SpotifyAlbums(BaseSpotifyAPI):
             max_ids=20,
             transform_func=SpotifyDataTransformer.transform_album
         )
-    
+
     def get_new_releases(self, limit: int = 20, offset: int = 0, country: Optional[str] = None) -> List[Dict[str, Any]]:
         """
         Get new album releases.
@@ -125,16 +125,16 @@ class SpotifyAlbums(BaseSpotifyAPI):
         params = {}
         if country:
             params["country"] = country
-        
+
         data = self._make_api_call(
-            "GET", 
-            "/browse/new-releases", 
+            "GET",
+            "/browse/new-releases",
             params={**params, "limit": min(limit, 50), "offset": offset},
             default_return={}
         )
-        
+
         if not data:
             return []
-        
+
         albums = data.get('albums', {}).get('items', [])
-        return [SpotifyDataTransformer.transform_album(album) for album in albums] 
+        return [SpotifyDataTransformer.transform_album(album) for album in albums]

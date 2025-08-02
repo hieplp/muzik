@@ -5,8 +5,8 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "muzik"
 version = "0.1.0"
-description = "A Python console application"
-authors = [{name = "Your Name", email = "your.email@example.com"}]
+description = "A Python console application that play the music"
+authors = [{ name = "HiepLP", email = "hiepphuocly@gmail.com" }]
 readme = "README.md"
 requires-python = ">=3.8"
 classifiers = [

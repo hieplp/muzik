@@ -23,17 +23,20 @@ A feature-rich Python console application built with modern tools and best pract
 ### Development Installation
 
 1. Clone the repository:
+
 ```bash
 git clone <repository-url>
 cd muzik
 ```
 
 2. Install in development mode:
+
 ```bash
 make install-dev
 ```
 
 Or manually:
+
 ```bash
 pip install -e ".[dev]"
 ```
@@ -100,21 +103,21 @@ The application supports configuration through:
 To use Spotify features, you need to configure your Spotify API credentials:
 
 1. **Get Spotify API Credentials**:
-   - Go to [Spotify Developer Dashboard](https://developer.spotify.com/dashboard)
-   - Create a new application
-   - Get your Client ID and Client Secret
-   - Set up OAuth redirect URI (default: `http://localhost:8888/callback`)
+    - Go to [Spotify Developer Dashboard](https://developer.spotify.com/dashboard)
+    - Create a new application
+    - Get your Client ID and Client Secret
+    - Set up OAuth redirect URI (default: `http://localhost:8888/callback`)
 
 2. **Configure in the Application**:
-   - Run the application and go to Settings > Spotify API Settings
-   - Enter your Client ID and Client Secret
-   - Generate and enter your Access Token and Refresh Token
+    - Run the application and go to Settings > Spotify API Settings
+    - Enter your Client ID and Client Secret
+    - Generate and enter your Access Token and Refresh Token
 
 3. **Available Spotify Features**:
-   - Search for tracks by title, artist, or album
-   - View your personal playlists
-   - Browse playlist contents
-   - Get track details and metadata
+    - Search for tracks by title, artist, or album
+    - View your personal playlists
+    - Browse playlist contents
+    - Get track details and metadata
 
 ## Development
 
@@ -179,6 +182,7 @@ make run
 To add a new command to the CLI:
 
 1. Add the command function to `muzik/main.py`:
+
 ```python
 @app.command()
 def my_command(
@@ -189,6 +193,7 @@ def my_command(
 ```
 
 2. The command will be automatically available:
+
 ```bash
 muzik my-command --param value
 ```

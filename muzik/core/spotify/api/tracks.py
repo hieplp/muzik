@@ -4,13 +4,12 @@ Spotify tracks API operations.
 
 from typing import Any, Dict, List, Optional
 
-from ...config import Config
 from .base import BaseSpotifyAPI, SpotifyDataTransformer
 
 
 class SpotifyTracks(BaseSpotifyAPI):
     """Handles Spotify track operations."""
-    
+
     def search_tracks(self, query: str, limit: int = 10) -> List[Dict[str, Any]]:
         """
         Search for tracks on Spotify.
@@ -28,7 +27,7 @@ class SpotifyTracks(BaseSpotifyAPI):
             limit=limit,
             transform_func=SpotifyDataTransformer.transform_track
         )
-    
+
     def get_track(self, track_id: str) -> Optional[Dict[str, Any]]:
         """
         Get detailed information about a specific track.
@@ -42,9 +41,9 @@ class SpotifyTracks(BaseSpotifyAPI):
         data = self._make_api_call("GET", f"/tracks/{track_id}", default_return=None)
         if not data:
             return None
-        
+
         return SpotifyDataTransformer.transform_track(data)
-    
+
     def get_multiple_tracks(self, track_ids: List[str]) -> List[Dict[str, Any]]:
         """
         Get information about multiple tracks.
@@ -61,7 +60,7 @@ class SpotifyTracks(BaseSpotifyAPI):
             max_ids=50,
             transform_func=SpotifyDataTransformer.transform_track
         )
-    
+
     def get_audio_features(self, track_id: str) -> Optional[Dict[str, Any]]:
         """
         Get audio features for a track.
@@ -73,7 +72,7 @@ class SpotifyTracks(BaseSpotifyAPI):
             Audio features or None if not found
         """
         return self._make_api_call("GET", f"/audio-features/{track_id}", default_return=None)
-    
+
     def get_user_top_tracks(self, limit: int = 20, time_range: str = "medium_term") -> List[Dict[str, Any]]:
         """
         Get user's top tracks.
@@ -86,11 +85,11 @@ class SpotifyTracks(BaseSpotifyAPI):
             List of track information
         """
         params = {"time_range": time_range}
-        
+
         return self._get_paginated_items(
             endpoint="/me/top/tracks",
             limit=limit,
             max_limit=50,
             params=params,
             transform_func=SpotifyDataTransformer.transform_track
-        ) 
+        )

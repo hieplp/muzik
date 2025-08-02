@@ -51,15 +51,16 @@ def validate_required(value: Any, field_name: str) -> None:
     """
     if value is None:
         raise ValueError(f"{field_name} is required")
-    
+
     if isinstance(value, str) and not value.strip():
         raise ValueError(f"{field_name} cannot be empty")
-    
+
     if isinstance(value, (list, dict, set)) and not value:
         raise ValueError(f"{field_name} cannot be empty")
 
 
-def validate_length(value: str, min_length: Optional[int] = None, max_length: Optional[int] = None, field_name: str = "Value") -> None:
+def validate_length(value: str, min_length: Optional[int] = None, max_length: Optional[int] = None,
+                    field_name: str = "Value") -> None:
     """
     Validate string length.
     
@@ -74,17 +75,18 @@ def validate_length(value: str, min_length: Optional[int] = None, max_length: Op
     """
     if not isinstance(value, str):
         raise ValueError(f"{field_name} must be a string")
-    
+
     length = len(value)
-    
+
     if min_length is not None and length < min_length:
         raise ValueError(f"{field_name} must be at least {min_length} characters long")
-    
+
     if max_length is not None and length > max_length:
         raise ValueError(f"{field_name} must be at most {max_length} characters long")
 
 
-def validate_range(value: int, min_value: Optional[int] = None, max_value: Optional[int] = None, field_name: str = "Value") -> None:
+def validate_range(value: int, min_value: Optional[int] = None, max_value: Optional[int] = None,
+                   field_name: str = "Value") -> None:
     """
     Validate numeric range.
     
@@ -99,10 +101,10 @@ def validate_range(value: int, min_value: Optional[int] = None, max_value: Optio
     """
     if not isinstance(value, (int, float)):
         raise ValueError(f"{field_name} must be a number")
-    
+
     if min_value is not None and value < min_value:
         raise ValueError(f"{field_name} must be at least {min_value}")
-    
+
     if max_value is not None and value > max_value:
         raise ValueError(f"{field_name} must be at most {max_value}")
 
@@ -134,7 +136,7 @@ def validate_file_exists(file_path: str) -> None:
         FileNotFoundError: If file does not exist
     """
     from pathlib import Path
-    
+
     if not Path(file_path).exists():
         raise FileNotFoundError(f"File not found: {file_path}")
 
@@ -150,10 +152,10 @@ def validate_directory_exists(dir_path: str) -> None:
         FileNotFoundError: If directory does not exist
     """
     from pathlib import Path
-    
+
     path = Path(dir_path)
     if not path.exists():
         raise FileNotFoundError(f"Directory not found: {dir_path}")
-    
+
     if not path.is_dir():
-        raise ValueError(f"Path is not a directory: {dir_path}") 
+        raise ValueError(f"Path is not a directory: {dir_path}")

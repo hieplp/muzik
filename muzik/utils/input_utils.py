@@ -3,14 +3,10 @@ Enhanced input utilities using Rich for console applications.
 """
 
 import sys
-from typing import Optional, List, Any
+from typing import Optional, List
 
 from rich.console import Console
-from rich.prompt import Prompt, Confirm, IntPrompt, FloatPrompt
-from rich.panel import Panel
-from rich.text import Text
-from rich.layout import Layout
-from rich.live import Live
+from rich.prompt import Prompt, Confirm, IntPrompt
 from rich.table import Table
 
 console = Console()
@@ -46,16 +42,16 @@ def get_single_char() -> str:
         else:
             import tty
             import termios
-            
+
             fd = sys.stdin.fileno()
             old_settings = termios.tcgetattr(fd)
             try:
                 tty.setraw(sys.stdin.fileno())
                 char = sys.stdin.read(1)
-                
+
                 if char == '\x03':
-                    raise KeyboardInterrupt                    
-                # Handle arrow key escape sequences
+                    raise KeyboardInterrupt
+                    # Handle arrow key escape sequences
                 if char == '\x1b':  # Escape sequence
                     next_char = sys.stdin.read(1)
                     if next_char == '[':
@@ -83,12 +79,12 @@ def get_single_char() -> str:
 
 
 def rich_prompt(
-    message: str,
-    default: Optional[str] = None,
-    password: bool = False,
-    choices: Optional[List[str]] = None,
-    show_choices: bool = True,
-    show_default: bool = True,
+        message: str,
+        default: Optional[str] = None,
+        password: bool = False,
+        choices: Optional[List[str]] = None,
+        show_choices: bool = True,
+        show_default: bool = True,
 ) -> str:
     """
     Enhanced prompt using Rich with better styling and validation.
@@ -120,10 +116,10 @@ def rich_prompt(
 
 
 def rich_confirm(
-    message: str,
-    default: Optional[bool] = None,
-    yes_text: str = "yes",
-    no_text: str = "no"
+        message: str,
+        default: Optional[bool] = None,
+        yes_text: str = "yes",
+        no_text: str = "no"
 ) -> bool:
     """
     Enhanced confirmation dialog using Rich.
@@ -149,10 +145,10 @@ def rich_confirm(
 
 
 def rich_int_prompt(
-    message: str,
-    default: Optional[int] = None,
-    min_value: Optional[int] = None,
-    max_value: Optional[int] = None
+        message: str,
+        default: Optional[int] = None,
+        min_value: Optional[int] = None,
+        max_value: Optional[int] = None
 ) -> int:
     """
     Enhanced integer prompt using Rich with validation.
@@ -174,32 +170,32 @@ def rich_int_prompt(
                     default=default,
                     console=console
                 )
-                
+
                 if min_value is not None and value < min_value:
                     console.print(f"[red]Value must be at least {min_value}[/red]")
                     continue
-                    
+
                 if max_value is not None and value > max_value:
                     console.print(f"[red]Value must be at most {max_value}[/red]")
                     continue
-                    
+
                 return value
-                
+
             except ValueError:
                 console.print("[red]Please enter a valid integer[/red]")
                 continue
-                
+
     except KeyboardInterrupt:
         console.print("\n[yellow]Operation cancelled by user[/yellow]")
         raise
 
 
 def rich_choice_menu(
-    title: str,
-    choices: List[str],
-    descriptions: Optional[List[str]] = None,
-    allow_numbers: bool = True,
-    show_quit: bool = True
+        title: str,
+        choices: List[str],
+        descriptions: Optional[List[str]] = None,
+        allow_numbers: bool = True,
+        show_quit: bool = True
 ) -> Optional[str]:
     """
     Create a Rich-styled choice menu.
@@ -216,36 +212,36 @@ def rich_choice_menu(
     """
     if descriptions and len(descriptions) != len(choices):
         descriptions = None
-    
+
     table = Table(title=f"[bold blue]{title}[/bold blue]", show_header=False)
     table.add_column("Option", style="cyan", width=8)
     table.add_column("Choice", style="white", width=30)
     if descriptions:
         table.add_column("Description", style="dim", width=40)
-    
+
     # Add choices to table
     for i, choice in enumerate(choices, 1):
         option = f"[{i}]" if allow_numbers else ""
-        desc = descriptions[i-1] if descriptions else ""
-        
+        desc = descriptions[i - 1] if descriptions else ""
+
         if descriptions:
             table.add_row(option, choice, desc)
         else:
             table.add_row(option, choice)
-    
+
     if show_quit:
         table.add_row("", "─" * 30, "")
         table.add_row("[q]", "Quit", "Exit menu")
-    
+
     console.print(table)
-    
+
     # Build valid choices
     valid_choices = []
     if allow_numbers:
         valid_choices.extend([str(i) for i in range(1, len(choices) + 1)])
     if show_quit:
         valid_choices.append("q")
-    
+
     try:
         choice = Prompt.ask(
             "[bold cyan]Select option[/bold cyan]",
@@ -253,25 +249,25 @@ def rich_choice_menu(
             show_choices=False,
             console=console
         )
-        
+
         if choice == "q":
             return None
-        
+
         if allow_numbers and choice.isdigit():
             index = int(choice) - 1
             if 0 <= index < len(choices):
                 return choices[index]
-        
+
         return choice
-        
+
     except KeyboardInterrupt:
         console.print("\n[yellow]Operation cancelled by user[/yellow]")
         return None
 
 
 def display_loading_with_status(
-    tasks: List[str],
-    status_text: str = "Processing..."
+        tasks: List[str],
+        status_text: str = "Processing..."
 ) -> None:
     """
     Display a loading interface with multiple tasks.
@@ -283,10 +279,10 @@ def display_loading_with_status(
     table = Table(title=f"[bold blue]{status_text}[/bold blue]")
     table.add_column("Task", style="cyan")
     table.add_column("Status", style="green")
-    
+
     for task in tasks:
         table.add_row(task, "⏳ Pending")
-    
+
     console.print(table)
 
 
@@ -302,4 +298,4 @@ def pause_for_user(message: str = "Press Enter to continue...") -> None:
         input()
     except KeyboardInterrupt:
         console.print("\n[yellow]Operation cancelled by user[/yellow]")
-        raise 
+        raise

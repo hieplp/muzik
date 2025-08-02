@@ -4,4 +4,4 @@ Spotify utilities module - contains utility functions and helpers for Spotify op
 
 # Currently empty - ready for future Spotify-specific utilities
 
-__all__ = [] 
+__all__ = []

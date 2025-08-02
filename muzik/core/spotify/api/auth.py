@@ -9,7 +9,7 @@ from ...config import Config
 
 class SpotifyAuth:
     """Handles Spotify authentication and token management."""
-    
+
     def __init__(self, config: Config):
         """
         Initialize Spotify authentication.
@@ -23,7 +23,7 @@ class SpotifyAuth:
         self.access_token = config.get("spotify.access_token", "")
         self.refresh_token = config.get("spotify.refresh_token", "")
         self.redirect_uri = config.get("spotify.redirect_uri", "http://localhost:8888/callback")
-    
+
     def is_configured(self) -> bool:
         """
         Check if Spotify API is properly configured.
@@ -32,7 +32,7 @@ class SpotifyAuth:
             True if configured, False otherwise
         """
         return bool(self.client_id and self.client_secret)
-    
+
     def set_credentials(self, client_id: str, client_secret: str) -> None:
         """
         Set Spotify client credentials.
@@ -45,7 +45,7 @@ class SpotifyAuth:
         self.client_secret = client_secret
         self.config.set("spotify.client_id", client_id)
         self.config.set("spotify.client_secret", client_secret)
-    
+
     def set_tokens(self, access_token: str, refresh_token: Optional[str] = None) -> None:
         """
         Set Spotify access tokens.
@@ -56,23 +56,23 @@ class SpotifyAuth:
         """
         self.access_token = access_token
         self.config.set("spotify.access_token", access_token)
-        
+
         if refresh_token:
             self.refresh_token = refresh_token
             self.config.set("spotify.refresh_token", refresh_token)
-    
+
     def clear_settings(self) -> None:
         """Clear all Spotify settings."""
         self.config.set("spotify.client_id", "")
         self.config.set("spotify.client_secret", "")
         self.config.set("spotify.access_token", "")
         self.config.set("spotify.refresh_token", "")
-        
+
         self.client_id = ""
         self.client_secret = ""
         self.access_token = ""
         self.refresh_token = ""
-    
+
     def get_status(self) -> dict:
         """
         Get Spotify API configuration status.
@@ -88,7 +88,7 @@ class SpotifyAuth:
             "refresh_token_set": bool(self.refresh_token),
             "client_id": self.client_id[:10] + "..." if self.client_id else "",
         }
-    
+
     def test_connection(self) -> tuple[bool, Optional[str]]:
         """
         Test API connection.
@@ -98,7 +98,7 @@ class SpotifyAuth:
         """
         if not self.is_configured():
             return False, "Spotify API is not configured"
-        
+
         try:
             from muzik.utils.api_client import SpotifyAPIClient
             api_client = SpotifyAPIClient(self.client_id, self.client_secret)
@@ -107,7 +107,7 @@ class SpotifyAuth:
             return True, None
         except Exception as e:
             return False, str(e)
-    
+
     def get_api_client(self):
         """
         Get configured Spotify API client.
@@ -117,7 +117,7 @@ class SpotifyAuth:
         """
         if not self.is_configured():
             return None
-        
+
         try:
             from muzik.utils.api_client import SpotifyAPIClient
             client = SpotifyAPIClient(self.client_id, self.client_secret)
@@ -138,4 +138,4 @@ def validate_spotify_config(config: Config) -> bool:
         True if valid, False otherwise
     """
     auth = SpotifyAuth(config)
-    return auth.is_configured() 
+    return auth.is_configured()

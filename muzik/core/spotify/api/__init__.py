@@ -2,21 +2,21 @@
 Spotify API module - handles all Spotify API operations.
 """
 
-from .auth import SpotifyAuth
-from .tracks import SpotifyTracks
 from .albums import SpotifyAlbums
 from .artists import SpotifyArtists
-from .playlists import SpotifyPlaylists
-from .client import SpotifyClient
+from .auth import SpotifyAuth
 from .base import BaseSpotifyAPI, SpotifyDataTransformer
+from .client import SpotifyClient
+from .playlists import SpotifyPlaylists
+from .tracks import SpotifyTracks
 
 __all__ = [
     'SpotifyAuth',
     'SpotifyTracks',
-    'SpotifyAlbums', 
+    'SpotifyAlbums',
     'SpotifyArtists',
     'SpotifyPlaylists',
     'SpotifyClient',
     'BaseSpotifyAPI',
     'SpotifyDataTransformer'
-] 
+]

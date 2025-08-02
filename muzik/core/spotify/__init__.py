@@ -28,7 +28,7 @@ from .display import (
 __all__ = [
     # API classes
     'SpotifyAuth',
-    'SpotifyTracks', 
+    'SpotifyTracks',
     'SpotifyAlbums',
     'SpotifyArtists',
     'SpotifyPlaylists',
@@ -43,4 +43,4 @@ __all__ = [
     'display_album_details',
     'display_artist_details',
     'SpotifyStreamer'
-] 
+]
